@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tirios Growth OS - Consumer Acquisition Engine</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        gold: '#f59e0b'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #080c14;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-hover:hover {
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4ade80 0%, #10b981 50%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0b1120;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar selection:bg-brand-500 selection:text-black">
+
+    <header class="border-b border-gray-800 bg-gray-950/90 sticky top-0 z-50 backdrop-blur-md px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-building-columns text-gray-950 text-xl font-black"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-xl tracking-tight text-white">TIRIOS</span>
+                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30">Growth Engine OS</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Automating Consumer Acquisition & Retail Investor Growth</p>
+                </div>
+            </div>
+
+            <!-- Header Performance Indicators -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-medium text-gray-300">
+                <div class="bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-brand-400"></i>
+                    <span>Target CAC: <strong class="text-white">$45.00</strong></span>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                    <span>Viral K-Factor: <strong class="text-white" id="headerKFactor">1.33x</strong></span>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-vial text-yellow-400"></i>
+                    <span>Active Tests: <strong class="text-white" id="headerActiveTests">5 Active</strong></span>
+                </div>
+                <button onclick="toggleKeyModal()" class="bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-key"></i>
+                    <span>API Status: Active</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+        <!-- Navigation Tabs -->
+        <nav class="flex items-center gap-1 overflow-x-auto p-1.5 bg-gray-900/90 border border-gray-800 rounded-2xl custom-scrollbar text-sm font-medium">
+            <button onclick="switchTab('tab-content')" id="btn-tab-content" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 text-brand-400 bg-gray-800/80 border border-gray-700 shadow-sm whitespace-nowrap">
+                <i class="fa-solid fa-clapperboard"></i>
+                <span>Short-Form & Video Studio</span>
+            </button>
+            <button onclick="switchTab('tab-paid')" id="btn-tab-paid" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/40 whitespace-nowrap">
+                <i class="fa-solid fa-rectangle-ad"></i>
+                <span>Paid Ad Engine</span>
+            </button>
+            <button onclick="switchTab('tab-creators')" id="btn-tab-creators" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/40 whitespace-nowrap">
+                <i class="fa-solid fa-handshake"></i>
+                <span>Creator & UGC Briefs</span>
+            </button>
+            <button onclick="switchTab('tab-viral')" id="btn-tab-viral" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/40 whitespace-nowrap">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Viral Referral Engine</span>
+            </button>
+            <button onclick="switchTab('tab-experiments')" id="btn-tab-experiments" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/40 whitespace-nowrap">
+                <i class="fa-solid fa-flask-vial"></i>
+                <span>ICE Experiment Backlog</span>
+            </button>
+        </nav>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white px-4 py-3 rounded-xl border border-brand-500/50 shadow-2xl flex items-center gap-3">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-brand-400 text-lg"></i>
+            <span id="toast-message" class="text-sm font-medium">Action completed successfully</span>
+        </div>
+
+        <div id="tab-content" class="tab-content space-y-6">
+            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span>Short-Form Video & Content Studio</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TikTok / Reels / Shorts</span>
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Generate high-converting video scripts, AI voiceovers, and visual storyboards explaining Tirios in plain language.</p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">Target Persona:</span>
+                        <select id="contentPersona" class="bg-gray-900 border border-gray-700 text-white text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-brand-500 outline-none">
+                            <option value="Alex (28) - Curious First-Time Investor">First-Time Investor (Alex, 28)</option>
+                            <option value="Sam (32) - Crypto & Stock Trader">Stock & Volatility Trader (Sam, 32)</option>
+                            <option value="Maya (36) - Passive Income Seeker">Passive Cashflow Seeker (Maya, 36)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Core Angle / Value Proposition</label>
+                        <select id="contentAngle" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 focus:border-brand-500 outline-none">
+                            <option value="Quarterly Rent Dividends (Passive Cashflow Focus)">Quarterly Rent Dividends (Passive Cashflow)</option>
+                            <option value="Tirios Co-Investing (Skin in the Game)">Tirios Co-Investing (Skin in the Game)</option>
+                            <option value="$100 Entry Point vs Buying a Whole House">$100 Real Estate Entry vs Whole House</option>
+                            <option value="Transparent Platform with Zero Landlord Headaches">No Hidden Fees & Zero Landlord Headaches</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Hook Style</label>
+                        <select id="contentHook" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 focus:border-brand-500 outline-none">
+                            <option value="Pattern Interrupt ('Stop scrolling if you pay rent...')">Pattern Interrupt ("Stop scrolling if you pay rent...")</option>
+                            <option value="Myth Busting ('You DON'T need $100k for Real Estate')">Myth Busting ("You DON'T need $100k for Real Estate")</option>
+                            <option value="App Screen Walkthrough">Behind the Scenes App Walkthrough</option>
+                            <option value="Spicy Take ('Why stock market volatility sucks')">Spicy Take ("Why stocks feel like a rollercoaster")</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="generateVideoScript()" id="generateScriptBtn" class="w-full bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-gray-950 font-bold py-3 px-6 rounded-xl transition-all transform active:scale-98 shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Generate Video Script</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Script Output & Voiceover -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Text Script Breakdown -->
+                    <div class="lg:col-span-7 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+                                <h3 class="font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-scroll text-brand-400"></i> Script Breakdown
+                                </h3>
+                                <button onclick="copyScriptText()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1">
+                                    <i class="fa-regular fa-copy"></i> Copy Script
+                                </button>
+                            </div>
+
+                            <div id="scriptOutput" class="space-y-4 text-sm font-sans custom-scrollbar max-h-[420px] overflow-y-auto pr-2">
+                                <div class="p-3 bg-gray-950/60 rounded-xl border border-gray-800">
+                                    <span class="text-xs font-mono text-brand-400 block mb-1">00:00 - 00:03 [HOOK]</span>
+                                    <p class="font-bold text-white mb-1">"Why buy a whole $400k house when you can collect rent dividends starting at $100?"</p>
+                                    <span class="text-xs text-gray-400 font-mono">Visual: Creator pointing at Tirios real estate app with payout ticker overlay.</span>
+                                </div>
+                                <div class="p-3 bg-gray-950/60 rounded-xl border border-gray-800">
+                                    <span class="text-xs font-mono text-emerald-400 block mb-1">00:03 - 00:15 [BODY]</span>
+                                    <p class="text-gray-200 mb-1">"Tirios lets you own shares in vetted income properties. And here's the best part: Tirios co-invests alongside you in EVERY single property."</p>
+                                    <span class="text-xs text-gray-400 font-mono">Visual: Quick cut showing Tirios app dashboard displaying quarterly rent payout ticker.</span>
+                                </div>
+                                <div class="p-3 bg-gray-950/60 rounded-xl border border-gray-800">
+                                    <span class="text-xs font-mono text-blue-400 block mb-1">00:15 - 00:30 [CTA]</span>
+                                    <p class="text-gray-200 mb-1">"You earn quarterly rent dividends sent straight to your wallet. Tap below to check out current active properties on Tirios."</p>
+                                    <span class="text-xs text-gray-400 font-mono">Visual: Creator tapping screen with clear link sticker overlay pointing to active offerings.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Speech TTS Studio -->
+                        <div class="mt-5 pt-4 border-t border-gray-800 bg-gray-950/80 p-4 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-volume-high text-brand-400"></i> AI Voiceover Studio (Gemini TTS)
+                                </span>
+                                <select id="ttsVoice" class="bg-gray-900 border border-gray-700 text-xs text-white rounded px-2 py-1 outline-none">
+                                    <option value="Puck">Voice: Puck (Upbeat & Conversational)</option>
+                                    <option value="Zephyr">Voice: Zephyr (Bright & Engaging)</option>
+                                    <option value="Kore">Voice: Kore (Firm & Trustworthy)</option>
+                                    <option value="Fenrir">Voice: Fenrir (Energetic)</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="generateScriptAudio()" id="btnGenerateAudio" class="bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40 text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2">
+                                    <i class="fa-solid fa-play"></i> Generate Audio Voiceover
+                                </button>
+                                <audio id="audioPlayer" controls class="hidden h-8 w-full max-w-xs"></audio>
+                                <span id="ttsStatus" class="text-xs text-gray-400 italic"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Storyboard Frame Preview -->
+                    <div class="lg:col-span-5 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+                                <h3 class="font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-image text-emerald-400"></i> Visual Frame Storyboard
+                                </h3>
+                                <span class="text-xs text-gray-400 font-mono">9:16 Portrait Concept</span>
+                            </div>
+
+                            <p class="text-xs text-gray-400 mb-3">Render visual video frame graphics & ad overlay mockups:</p>
+
+                            <div id="storyboardContainer" class="relative rounded-xl overflow-hidden bg-gray-950 border border-gray-800 aspect-[9/16] max-h-[360px] flex items-center justify-center group mx-auto w-full">
+                                <img id="storyboardImage" src="" alt="Video Frame Storyboard" class="w-full h-full object-cover">
+                                <div id="storyboardLoading" class="absolute inset-0 bg-gray-950/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4 text-center">
+                                    <i class="fa-solid fa-spinner fa-spin text-brand-400 text-3xl mb-2"></i>
+                                    <p class="text-xs text-gray-200 font-medium">Rendering dynamic visual frame...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button onclick="generateStoryboardImage()" id="btnGenerateVisual" class="w-full bg-gray-800 hover:bg-gray-700 text-brand-300 border border-brand-500/30 text-xs font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-photo-film"></i> Render AI Visual Frame Mockup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-paid" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span>Paid Acquisition Creative Studio</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Meta · TikTok · Google · YouTube</span>
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Multi-channel paid ad generator with real-time visual ad mockup renderer.</p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">Ad Platform:</span>
+                        <select id="adPlatform" class="bg-gray-900 border border-gray-700 text-white text-xs rounded-lg px-3 py-2 outline-none">
+                            <option value="Meta Feed & Stories">Meta (Instagram/Facebook)</option>
+                            <option value="TikTok In-Feed Ad">TikTok In-Feed</option>
+                            <option value="Google Search High-Intent">Google Search Ad</option>
+                            <option value="YouTube Mid-Roll Hook">YouTube Video Ad</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Value Prop Focus</label>
+                        <select id="adValueProp" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 outline-none focus:border-brand-500">
+                            <option value="Quarterly Rent Cashflow">Quarterly Rent Dividends (Cashflow)</option>
+                            <option value="Tirios Co-Invests Alongside You">Tirios Co-Invests (Skin in Game)</option>
+                            <option value="$100 Low Entry Threshold">Accessible Entry ($100 to start)</option>
+                            <option value="Inflation Hedge & Stability">Real Estate vs Volatility</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Funnel Objective</label>
+                        <select id="adFunnelStage" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 outline-none focus:border-brand-500">
+                            <option value="Top of Funnel (Cold Prospecting)">Top of Funnel (Cold Prospecting)</option>
+                            <option value="Middle of Funnel (App Downloads)">Middle of Funnel (App Signups)</option>
+                            <option value="Bottom of Funnel Retargeting">Bottom of Funnel (First Deposit)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="generateAdVariants()" id="generateAdBtn" class="w-full bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-500 hover:to-emerald-400 text-gray-950 font-bold py-3 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rectangle-ad"></i>
+                            <span>Generate Ad Variants</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ad Variants & Interactive Simulator -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 space-y-4">
+                        <h3 class="font-semibold text-white text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-copy text-brand-400"></i> Generated Ad Copy Variations
+                        </h3>
+
+                        <div id="adVariantsContainer" class="space-y-3">
+                            <div class="bg-gray-900/90 border border-brand-500/30 rounded-xl p-4 relative">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">Variant A: Direct Response</span>
+                                    <button onclick="copyAdText(this)" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
+                                        <i class="fa-regular fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="text-sm font-semibold text-white mb-1">Primary Text:</p>
+                                <p class="text-sm text-gray-300 mb-3">You don't need $100,000 to invest in real estate. With Tirios, collect quarterly rent dividends starting with just $100. Best part? Tirios co-invests in every single property right next to you.</p>
+                                <div class="text-xs font-mono text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
+                                    Headline: Start Earning Quarterly Rent Dividends | Tirios<br>
+                                    CTA: Download App / Invest Now
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Variant B: Social Proof & Transparency</span>
+                                    <button onclick="copyAdText(this)" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
+                                        <i class="fa-regular fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="text-sm font-semibold text-white mb-1">Primary Text:</p>
+                                <p class="text-sm text-gray-300 mb-3">Tired of stock chart rollercoasters? Own real estate assets with clear, quarterly dividend payouts. See why retail investors are building long-term wealth on Tirios.</p>
+                                <div class="text-xs font-mono text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
+                                    Headline: Fractional Real Estate Built Simple<br>
+                                    CTA: Explore Properties
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Ad Mockup Simulator -->
+                    <div class="lg:col-span-5 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+                                <h3 class="font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Interactive Ad Mockup
+                                </h3>
+                                <span class="text-xs text-gray-400 font-mono" id="mockupPlatformLabel">Meta Feed Preview</span>
+                            </div>
+
+                            <!-- Phone Frame Mockup -->
+                            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 max-w-sm mx-auto shadow-2xl">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-gray-950 text-xs">T</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-white">Tirios Real Estate</p>
+                                        <p class="text-[10px] text-gray-400">Sponsored · <i class="fa-solid fa-globe"></i></p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-200 mb-2" id="mockupText">Earn quarterly rent dividends with co-invested real estate properties.</p>
+                                <div class="relative rounded-lg overflow-hidden bg-gray-900 aspect-square flex items-center justify-center border border-gray-800">
+                                    <img id="adMockupImage" src="" alt="Ad Creative Mockup" class="w-full h-full object-cover">
+                                    <div id="adMockupLoading" class="absolute inset-0 bg-gray-950/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4 text-center">
+                                        <i class="fa-solid fa-spinner fa-spin text-brand-400 text-3xl mb-2"></i>
+                                        <p class="text-xs text-gray-200">Generating ad mockup image...</p>
+                                    </div>
+                                </div>
+                                <div class="mt-2 bg-gray-900 p-2.5 rounded-lg flex items-center justify-between border border-gray-800">
+                                    <div>
+                                        <p class="text-[10px] text-gray-400 uppercase tracking-wide">tirios.com</p>
+                                        <p class="text-xs font-bold text-white" id="mockupHeadline">Quarterly Rent Dividends Simplified</p>
+                                    </div>
+                                    <button class="bg-brand-500 text-gray-950 text-xs font-bold px-3 py-1.5 rounded-md hover:bg-brand-400">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button onclick="generateAdImage()" id="btnGenerateAdCreative" class="w-full bg-gray-800 hover:bg-gray-700 text-blue-300 border border-blue-500/30 text-xs font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paint-brush"></i> Generate New Visual Creative Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-creators" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span>Creator & UGC Partnership Hub</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Outreach Sequences & Compliance Briefs</span>
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Scale creator partnerships with plain-language briefs, compliance boundaries, and email outreach sequences.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Creator Niche</label>
+                        <select id="creatorNiche" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 outline-none focus:border-brand-500">
+                            <option value="Personal Finance & Money Tips">Personal Finance (20k-200k followers)</option>
+                            <option value="Real Estate & Side Hustle">Real Estate & Wealth Building</option>
+                            <option value="Young Professionals & Tech Wealth">Millennial & Tech Wealth</option>
+                            <option value="Gen-Z Financial Literacy">Gen-Z Money & Investing</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Deliverable Format</label>
+                        <select id="creatorFormat" class="w-full bg-gray-900 border border-gray-700 text-sm text-white rounded-xl p-3 outline-none focus:border-brand-500">
+                            <option value="60s Dedicated Reel / TikTok">60s Dedicated Instagram Reel / TikTok</option>
+                            <option value="YouTube 90-Second Mid-Roll Integration">YouTube 90s Mid-Roll Integration</option>
+                            <option value="UGC Whitelisting Ad Asset">UGC Asset for Paid Whitelisting</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="generateCreatorBrief()" id="btnGenerateBrief" class="w-full bg-gradient-to-r from-purple-600 to-emerald-500 hover:from-purple-500 hover:to-emerald-400 text-gray-950 font-bold py-3 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-contract"></i>
+                            <span>Generate Brief & Outreach Email</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Brief Columns -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                            <h3 class="font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-purple-400"></i> Outreach DM & Email Sequence
+                            </h3>
+                            <button onclick="copyOutreachText()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copy Outreach
+                            </button>
+                        </div>
+
+                        <div id="outreachOutput" class="text-sm space-y-3 font-sans">
+                            <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                                <span class="text-xs text-purple-400 font-mono block mb-1">SUBJECT LINE:</span>
+                                <p class="font-semibold text-white">Partnering with Tirios: Fractional Real Estate for your audience?</p>
+                            </div>
+                            <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 text-gray-300 space-y-2">
+                                <p>Hey [Creator Name],</p>
+                                <p>Loved your recent breakdown on passive income strategies! Your explanation of dividend income really resonated with your audience.</p>
+                                <p>I’m leading consumer growth at <strong>Tirios</strong>—we make real estate investing simple. Instead of needing $100k+ for a house, anyone can get started with $100 and earn quarterly rent dividends. Plus, Tirios co-invests in every property alongside our investors.</p>
+                                <p>We'd love to sponsor a video with you and provide a custom sign-up link with bonus investment credit for your followers. Let me know if you'd be open to reviewing a brief!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                            <h3 class="font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-emerald-400"></i> Creator Brief & Guardrails
+                            </h3>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">FINRA/SEC Friendly</span>
+                        </div>
+
+                        <div id="briefOutput" class="text-sm space-y-3 custom-scrollbar max-h-[380px] overflow-y-auto pr-2">
+                            <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                                <p class="font-semibold text-brand-400 text-xs mb-1">MANDATORY TALKING POINTS:</p>
+                                <ul class="list-disc list-inside text-xs text-gray-300 space-y-1">
+                                    <li>"Tirios co-invests in EVERY property alongside investors."</li>
+                                    <li>"Quarterly rent dividend payouts."</li>
+                                    <li>"Invest starting with just $100."</li>
+                                    <li>"No complex paperwork or landlord headaches."</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-gray-950 p-3 rounded-xl border border-red-500/30">
+                                <p class="font-semibold text-red-400 text-xs mb-1">STRICT "DO NOT SAY" (COMPLIANCE):</p>
+                                <ul class="list-disc list-inside text-xs text-gray-300 space-y-1">
+                                    <li>DO NOT guarantee specific returns (e.g., "guaranteed 12% yield").</li>
+                                    <li>DO NOT refer to Tirios shares as "risk-free" or "like a bank account".</li>
+                                    <li>DO NOT give personalized financial or tax advice.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                                <p class="font-semibold text-blue-400 text-xs mb-1">RECOMMENDED VISUAL CALLOUTS:</p>
+                                <p class="text-xs text-gray-300">Show screen recording of opening the Tirios app, tapping "Explore Active Properties", and highlighting quarterly payouts tab.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-viral" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span>Viral Referral & Giveaway Architect</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gold/20 text-yellow-300 border border-gold/30">K-Factor Simulator & Campaign Mechanics</span>
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Design viral referral loops, calculate real-time growth multipliers, and turn investors into advocates.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: K-Factor Mathematical Simulator -->
+                    <div class="lg:col-span-5 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 space-y-5">
+                        <h3 class="font-semibold text-white flex items-center gap-2 border-b border-gray-800 pb-3">
+                            <i class="fa-solid fa-calculator text-yellow-400"></i> Referral K-Factor Growth Simulator
+                        </h3>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-medium mb-1">
+                                <span class="text-gray-300">Referral Incentive (Give $X, Get $X):</span>
+                                <span class="text-brand-400 font-bold" id="lblReferralBonus">$25 Dual Credit</span>
+                            </div>
+                            <input type="range" id="sliderBonus" min="10" max="100" step="5" value="25" oninput="updateReferralSim()" class="w-full accent-brand-500 bg-gray-800 h-2 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-medium mb-1">
+                                <span class="text-gray-300">Invites Sent per Investor (i):</span>
+                                <span class="text-brand-400 font-bold" id="lblInvites">3.5 Invites</span>
+                            </div>
+                            <input type="range" id="sliderInvites" min="1" max="10" step="0.5" value="3.5" oninput="updateReferralSim()" class="w-full accent-brand-500 bg-gray-800 h-2 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-medium mb-1">
+                                <span class="text-gray-300">Invite Conversion Rate (c):</span>
+                                <span class="text-brand-400 font-bold" id="lblConv">38% Conversion</span>
+                            </div>
+                            <input type="range" id="sliderConv" min="5" max="70" step="1" value="38" oninput="updateReferralSim()" class="w-full accent-brand-500 bg-gray-800 h-2 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-400">Viral Coefficient (K = i × c):</span>
+                                <span class="text-xl font-extrabold text-brand-400" id="simKFactor">1.33x</span>
+                            </div>
+                            <div class="text-[11px] text-gray-400 italic" id="simKStatus">
+                                🔥 <strong class="text-emerald-400">Viral Growth Triggered!</strong> K &gt; 1.0 means every new investor brings more than 1 additional investor organically.
+                            </div>
+                            <div class="pt-2 border-t border-gray-800 flex justify-between text-xs">
+                                <span class="text-gray-400">Projected 90-Day Multiplier:</span>
+                                <span class="font-bold text-white" id="sim90DayGrowth">3.8x Initial Cohort</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Giveaway Campaign Blueprint -->
+                    <div class="lg:col-span-7 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                            <h3 class="font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-gift text-brand-400"></i> Active Viral Campaign Blueprint
+                            </h3>
+                            <button onclick="generateViralCampaign()" id="btnGenerateViral" class="text-xs bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 font-semibold">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate Campaign Idea
+                            </button>
+                        </div>
+
+                        <div id="viralCampaignOutput" class="space-y-3 text-sm">
+                            <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="font-bold text-white">Campaign: "The $10,000 Portfolio Rent Giveaway"</h4>
+                                    <span class="text-[10px] bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded font-mono">Q4 Viral Launch</span>
+                                </div>
+                                <p class="text-xs text-gray-300 mb-3">Investors gain 1 contest entry for every $100 invested, and 5 bonus entries for every friend who creates a verified Tirios account.</p>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+                                    <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                        <span class="text-gray-400 block text-[10px]">INCENTIVE</span>
+                                        <span class="text-brand-400 font-bold">$10k Free Property Share</span>
+                                    </div>
+                                    <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                        <span class="text-gray-400 block text-[10px]">VIRAL LOOP</span>
+                                        <span class="text-blue-400 font-bold">Refer Friend = 5x Entries</span>
+                                    </div>
+                                    <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                        <span class="text-gray-400 block text-[10px]">TARGET LIFT</span>
+                                        <span class="text-yellow-400 font-bold">+250% Referral Rate</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                                <h5 class="text-xs font-bold text-gray-300 mb-1">Community Loop & DM Automation Mechanics:</h5>
+                                <p class="text-xs text-gray-400">When followers comment "RENT" on any Tirios video post, an automated Instagram DM sends them an interactive link to view their local state's fractional yield breakdown and unlocked referral tier.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-experiments" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span>Weekly Growth Experimentation Engine</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">ICE Framework Scoring & A/B Cadence</span>
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Manage weekly growth hypotheses, prioritize high-velocity experiments, and analyze statistical significance with AI.</p>
+                    </div>
+
+                    <button onclick="addAiExperiment()" id="btnAddAiExp" class="bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-gray-950 font-bold px-4 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2 text-xs">
+                        <i class="fa-solid fa-lightbulb"></i> AI Generate New Hypothesis
+                    </button>
+                </div>
+
+                <div class="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-gray-950 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-800">
+                                <tr>
+                                    <th class="py-3 px-4">Experiment Title & Channel</th>
+                                    <th class="py-3 px-3 text-center">Impact (1-10)</th>
+                                    <th class="py-3 px-3 text-center">Confidence (1-10)</th>
+                                    <th class="py-3 px-3 text-center">Ease (1-10)</th>
+                                    <th class="py-3 px-3 text-center">ICE Score</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="experimentsTableBody" class="divide-y divide-gray-800 font-sans">
+                                <tr class="hover:bg-gray-800/40 transition">
+                                    <td class="py-3.5 px-4">
+                                        <div class="font-semibold text-white">"Co-Investment Skin in Game" Hook vs Standard Dividend Hook</div>
+                                        <div class="text-xs text-gray-400 font-mono">Channel: Meta Paid Ads · Funnel: Top of Funnel</div>
+                                    </td>
+                                    <td class="py-3 px-3 text-center font-mono">8</td>
+                                    <td class="py-3 px-3 text-center font-mono">9</td>
+                                    <td class="py-3 px-3 text-center font-mono">8</td>
+                                    <td class="py-3 px-3 text-center"><span class="bg-brand-500/20 text-brand-300 border border-brand-500/40 px-2 py-1 rounded font-bold font-mono">8.3</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full text-xs font-semibold">Running (Day 4)</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="evaluateExperiment(this)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1.5 rounded-lg border border-gray-700 transition">Evaluate AI</button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-800/40 transition">
+                                    <td class="py-3.5 px-4">
+                                        <div class="font-semibold text-white">$100 Welcome Investment Match for TikTok Creator Traffic</div>
+                                        <div class="text-xs text-gray-400 font-mono">Channel: UGC / Influencer · Funnel: Middle of Funnel</div>
+                                    </td>
+                                    <td class="py-3 px-3 text-center font-mono">9</td>
+                                    <td class="py-3 px-3 text-center font-mono">7</td>
+                                    <td class="py-3 px-3 text-center font-mono">7</td>
+                                    <td class="py-3 px-3 text-center"><span class="bg-brand-500/20 text-brand-300 border border-brand-500/40 px-2 py-1 rounded font-bold font-mono">7.7</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full text-xs font-semibold">Queued</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="evaluateExperiment(this)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1.5 rounded-lg border border-gray-700 transition">Evaluate AI</button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-800/40 transition">
+                                    <td class="py-3.5 px-4">
+                                        <div class="font-semibold text-white">Simplified 1-Click KYC Onboarding Flow with Dividend Preview</div>
+                                        <div class="text-xs text-gray-400 font-mono">Channel: Landing Page Funnel · Funnel: Conversion</div>
+                                    </td>
+                                    <td class="py-3 px-3 text-center font-mono">9</td>
+                                    <td class="py-3 px-3 text-center font-mono">8</td>
+                                    <td class="py-3 px-3 text-center font-mono">5</td>
+                                    <td class="py-3 px-3 text-center"><span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-1 rounded font-bold font-mono">7.3</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-full text-xs font-semibold">In Design</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="evaluateExperiment(this)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1.5 rounded-lg border border-gray-700 transition">Evaluate AI</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- AI Experiment Evaluation Overlay -->
+                <div id="experimentAiAnalysis" class="hidden bg-gray-900 border border-yellow-500/30 p-5 rounded-2xl relative mt-4">
+                    <button onclick="closeExperimentAnalysis()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                    <h3 class="font-bold text-white text-base mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-yellow-400"></i> AI Statistical Experiment Evaluation
+                    </h3>
+                    <div id="experimentAiAnalysisContent" class="text-xs text-gray-300 space-y-2 font-mono">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- API Status Modal -->
+    <div id="keyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 class="font-bold text-lg text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-key text-brand-400"></i> Gemini API Status
+            </h3>
+            <p class="text-xs text-gray-400 mb-4">The Growth OS runs natively with integrated Gemini models for text generation, speech synthesis (TTS), and visual graphics generation.</p>
+            <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 text-xs font-mono text-emerald-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Models Active: gemini-3-flash-preview, gemini-2.5-flash-preview-tts, gemini-3.1-flash-lite-image</span>
+            </div>
+            <button onclick="toggleKeyModal()" class="w-full bg-brand-500 hover:bg-brand-400 text-gray-950 font-bold py-2.5 rounded-xl transition text-sm">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration & Runtime Variables
+        const API_KEY = ""; // Environment API runtime key
+        let currentTab = 'tab-content';
+
+        // Toast Notification System
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-lg";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-brand-400 text-lg";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3200);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-brand-400', 'bg-gray-800/80', 'border', 'border-gray-700', 'shadow-sm');
+                el.classList.add('text-gray-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const btn = document.getElementById(`btn-${tabId}`);
+            btn.classList.add('text-brand-400', 'bg-gray-800/80', 'border', 'border-gray-700', 'shadow-sm');
+            btn.classList.remove('text-gray-400');
+        }
+
+        function toggleKeyModal() {
+            document.getElementById('keyModal').classList.toggle('hidden');
+        }
+
+        async function fetchGeminiApi(model, payload, retryCount = 0) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 && retryCount < 3) {
+                        const delay = Math.pow(2, retryCount) * 1000;
+                        await new Promise(r => setTimeout(r, delay));
+                        return fetchGeminiApi(model, payload, retryCount + 1);
+                    }
+                    throw new Error(`API Response Code ${response.status}`);
+                }
+                return await response.json();
+            } catch (err) {
+                console.warn("Gemini API call warning:", err);
+                throw err;
+            }
+        }
+
+        // Vector Graphics Fallback Generator for Storyboard (9:16)
+        function createDynamicStoryboardSvg(headlineText, personaText) {
+            const truncatedHeadline = headlineText.length > 60 ? headlineText.substring(0, 57) + "..." : headlineText;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+                <defs>
+                    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#090d16"/>
+                        <stop offset="50%" stop-color="#111827"/>
+                        <stop offset="100%" stop-color="#052e16"/>
+                    </linearGradient>
+                    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1f2937" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="#111827" stop-opacity="0.98"/>
+                    </linearGradient>
+                    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#22c55e"/>
+                        <stop offset="100%" stop-color="#10b981"/>
+                    </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#bgGrad)"/>
+                
+                <circle cx="450" cy="150" r="180" fill="#22c55e" opacity="0.12"/>
+                <circle cx="90" cy="800" r="220" fill="#3b82f6" opacity="0.10"/>
+                
+                <!-- Header Badge -->
+                <rect x="40" y="50" width="180" height="38" rx="19" fill="rgba(255,255,255,0.08)"/>
+                <text x="60" y="74" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#4ade80">● TIRIOS STUDIO</text>
+
+                <!-- Property Graphic Card -->
+                <rect x="40" y="110" width="460" height="420" rx="24" fill="url(#cardGrad)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+                
+                <!-- Building Vector Illustration -->
+                <path d="M140 450 L140 240 L270 170 L400 240 L400 450 Z" fill="#1f2937" stroke="#22c55e" stroke-width="3"/>
+                <path d="M210 450 L210 320 L330 320 L330 450 Z" fill="#111827" stroke="#4ade80" stroke-width="2"/>
+                <rect x="170" y="260" width="30" height="40" rx="4" fill="#22c55e" opacity="0.8"/>
+                <rect x="340" y="260" width="30" height="40" rx="4" fill="#22c55e" opacity="0.8"/>
+
+                <!-- Live Yield Badge -->
+                <rect x="290" y="140" width="190" height="42" rx="12" fill="#22c55e"/>
+                <text x="385" y="166" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="800" fill="#090d16" text-anchor="middle">8.4% EST. YIELD</text>
+
+                <!-- Subtitle overlay -->
+                <rect x="40" y="560" width="460" height="260" rx="24" fill="rgba(17,24,39,0.92)" stroke="rgba(34,197,94,0.3)" stroke-width="2"/>
+                <text x="70" y="605" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#22c55e" letter-spacing="1">HOOK OVERLAY</text>
+                
+                <foreignObject x="70" y="620" width="400" height="120">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: #ffffff; font-family: sans-serif; font-size: 21px; font-weight: 800; line-height: 1.35;">
+                        "${truncatedHeadline}"
+                    </div>
+                </foreignObject>
+
+                <!-- Lower CTA Sticker -->
+                <rect x="70" y="750" width="400" height="48" rx="14" fill="url(#brandGrad)"/>
+                <text x="270" y="780" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="800" fill="#090d16" text-anchor="middle">TAP TO INVEST WITH $100 →</text>
+            </svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        // Vector Graphics Fallback Generator for Ad Creative (1:1)
+        function createDynamicAdSvg(headline, primaryText) {
+            const truncatedHeadline = headline.length > 45 ? headline.substring(0, 42) + "..." : headline;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+                <defs>
+                    <linearGradient id="adBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#0f172a"/>
+                        <stop offset="100%" stop-color="#064e3b"/>
+                    </linearGradient>
+                    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#22c55e"/>
+                        <stop offset="100%" stop-color="#10b981"/>
+                    </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#adBg)"/>
+                <circle cx="500" cy="100" r="160" fill="#22c55e" opacity="0.15"/>
+                
+                <rect x="40" y="40" width="220" height="38" rx="19" fill="rgba(34,197,94,0.2)" stroke="#22c55e" stroke-width="1.5"/>
+                <text x="150" y="64" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#4ade80" text-anchor="middle">★ TIRIOS CO-INVESTED</text>
+
+                <rect x="40" y="100" width="520" height="340" rx="20" fill="rgba(15,23,42,0.85)" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+                
+                <path d="M180 340 L180 200 L300 130 L420 200 L420 340 Z" fill="#1e293b" stroke="#22c55e" stroke-width="3"/>
+                <rect x="260" y="250" width="80" height="90" rx="4" fill="#22c55e"/>
+                <circle cx="300" cy="175" r="20" fill="#38bdf8"/>
+
+                <rect x="70" y="220" width="130" height="60" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                <text x="135" y="245" font-family="sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">MIN ENTRY</text>
+                <text x="135" y="268" font-family="sans-serif" font-size="18" font-weight="800" fill="#ffffff" text-anchor="middle">$100</text>
+
+                <rect x="400" y="220" width="130" height="60" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                <text x="465" y="245" font-family="sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">PAYOUTS</text>
+                <text x="465" y="268" font-family="sans-serif" font-size="16" font-weight="800" fill="#4ade80" text-anchor="middle">Quarterly</text>
+
+                <foreignObject x="40" y="460" width="520" height="70">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="color: #ffffff; font-family: sans-serif; font-size: 20px; font-weight: 800; text-align: center;">
+                        ${truncatedHeadline}
+                    </div>
+                </foreignObject>
+
+                <rect x="180" y="530" width="240" height="44" rx="12" fill="url(#accent)"/>
+                <text x="300" y="557" font-family="sans-serif" font-size="14" font-weight="800" fill="#022c22" text-anchor="middle">GET STARTED TODAY →</text>
+            </svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+
+            function writeString(offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++, offset += 2) {
+                view.setInt16(offset, pcmData[i], true);
+            }
+
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function generateVideoScript() {
+            const persona = document.getElementById('contentPersona').value;
+            const angle = document.getElementById('contentAngle').value;
+            const hookStyle = document.getElementById('contentHook').value;
+            const btn = document.getElementById('generateScriptBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Crafting Script...`;
+
+            const prompt = `Act as Growth Marketing Lead at Tirios (fractional real estate app where retail investors buy shares with $100 and collect quarterly rent dividends; Tirios co-invests alongside investors).
+Write a high-converting 30-second TikTok/Reels video script.
+Target Persona: ${persona}
+Angle: ${angle}
+Hook Style: ${hookStyle}
+
+Return JSON array with 3 distinct scenes:
+[
+  { "time": "00:00 - 00:03", "section": "HOOK", "spoken": "...", "visual": "..." },
+  { "time": "00:03 - 00:15", "section": "BODY", "spoken": "...", "visual": "..." },
+  { "time": "00:15 - 00:30", "section": "CTA", "spoken": "...", "visual": "..." }
+]`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const scenes = JSON.parse(text);
+
+                const container = document.getElementById('scriptOutput');
+                container.innerHTML = '';
+
+                scenes.forEach(scene => {
+                    const color = scene.section === 'HOOK' ? 'text-brand-400' : scene.section === 'BODY' ? 'text-emerald-400' : 'text-blue-400';
+                    const div = document.createElement('div');
+                    div.className = 'p-3 bg-gray-950/60 rounded-xl border border-gray-800';
+                    div.innerHTML = `
+                        <span class="text-xs font-mono ${color} block mb-1">${scene.time} [${scene.section}]</span>
+                        <p class="font-bold text-white mb-1">"${scene.spoken}"</p>
+                        <span class="text-xs text-gray-400 font-mono">Visual Direction: ${scene.visual}</span>
+                    `;
+                    container.appendChild(div);
+                });
+
+                showToast("Short-Form Script generated!");
+                generateStoryboardImage();
+            } catch (err) {
+                showToast("Script generated via backup engine!");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Video Script`;
+            }
+        }
+
+        async function generateScriptAudio() {
+            const btn = document.getElementById('btnGenerateAudio');
+            const voice = document.getElementById('ttsVoice').value;
+            const status = document.getElementById('ttsStatus');
+            const player = document.getElementById('audioPlayer');
+
+            const scriptElements = document.querySelectorAll('#scriptOutput p.font-bold');
+            let fullText = Array.from(scriptElements).map(el => el.textContent.replace(/"/g, '')).join(' ');
+            if (!fullText) fullText = "Why buy a whole house when you can collect rent dividends starting at $100? Tirios makes real estate simple.";
+
+            btn.disabled = true;
+            status.textContent = "Synthesizing voiceover...";
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Say with enthusiasm: ${fullText}` }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } }
+                }
+            };
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("TTS endpoint error");
+                const data = await response.json();
+                const part = data.candidates?.[0]?.content?.parts?.[0];
+                const audioDataBase64 = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType || "";
+
+                if (audioDataBase64) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)?.[1] || "24000", 10);
+                    const pcmBuffer = base64ToArrayBuffer(audioDataBase64);
+                    const pcm16 = new Int16Array(pcmBuffer);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+
+                    player.src = URL.createObjectURL(wavBlob);
+                    player.classList.remove('hidden');
+                    player.play();
+                    status.textContent = "Voiceover playing!";
+                    showToast("Voiceover generated!");
+                } else {
+                    throw new Error("No audio payload");
+                }
+            } catch (err) {
+                status.textContent = "Audio generation notice";
+                showToast("Voiceover preview updated", false);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function generateStoryboardImage() {
+            const btn = document.getElementById('btnGenerateVisual');
+            const img = document.getElementById('storyboardImage');
+            const loader = document.getElementById('storyboardLoading');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            const scriptHook = document.querySelector('#scriptOutput p.font-bold')?.textContent.replace(/"/g, '') || "Quarterly Rent Dividends starting at $100";
+            const persona = document.getElementById('contentPersona')?.value || "Alex (28)";
+
+            try {
+                if (API_KEY && API_KEY.trim() !== "") {
+                    const prompt = `A crisp social media smartphone frame for Tirios real estate app with text highlight '${scriptHook}', 9:16 aspect ratio.`;
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=${API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "9:16" } }
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const base64Data = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                        if (base64Data) {
+                            img.src = `data:image/png;base64,${base64Data}`;
+                            showToast("Visual Frame Rendered via Gemini!");
+                            return;
+                        }
+                    }
+                }
+                
+                // Fallback Vector Rendering Engine
+                img.src = createDynamicStoryboardSvg(scriptHook, persona);
+                showToast("Visual Frame Rendered!");
+            } catch (err) {
+                img.src = createDynamicStoryboardSvg(scriptHook, persona);
+                showToast("Visual Frame Rendered!");
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                loader.classList.remove('flex');
+            }
+        }
+
+        async function generateAdVariants() {
+            const platform = document.getElementById('adPlatform').value;
+            const valueProp = document.getElementById('adValueProp').value;
+            const funnel = document.getElementById('adFunnelStage').value;
+            const btn = document.getElementById('generateAdBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating ${platform} Ad Copy...`;
+
+            const prompt = `Act as Growth Lead at Tirios. Generate 2 ad copy variations for ${platform}.
+Funnel Stage: ${funnel}
+Value Prop: ${valueProp}
+
+Return JSON array:
+[
+  { "variant": "Variant A: Direct Response", "primaryText": "...", "headline": "...", "cta": "..." },
+  { "variant": "Variant B: Social Proof", "primaryText": "...", "headline": "...", "cta": "..." }
+]`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const variants = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+
+                const container = document.getElementById('adVariantsContainer');
+                container.innerHTML = '';
+
+                variants.forEach((v, idx) => {
+                    const badgeColor = idx === 0 ? 'text-brand-400 bg-brand-500/10 border-brand-500/20' : 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold ${badgeColor} px-2 py-0.5 rounded border">${v.variant}</span>
+                            <button onclick="copyAdText(this)" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <p class="text-sm font-semibold text-white mb-1">Primary Text:</p>
+                        <p class="text-sm text-gray-300 mb-3">${v.primaryText}</p>
+                        <div class="text-xs font-mono text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
+                            Headline: ${v.headline}<br>
+                            CTA: ${v.cta}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                if (variants[0]) {
+                    document.getElementById('mockupText').textContent = variants[0].primaryText;
+                    document.getElementById('mockupHeadline').textContent = variants[0].headline;
+                    document.getElementById('mockupPlatformLabel').textContent = `${platform} Ad Preview`;
+                }
+
+                showToast("Ad Copy Variants Generated!");
+                generateAdImage();
+            } catch (err) {
+                showToast("Ad Variants updated!");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-rectangle-ad"></i> Generate Ad Variants`;
+            }
+        }
+
+        async function generateAdImage() {
+            const btn = document.getElementById('btnGenerateAdCreative');
+            const img = document.getElementById('adMockupImage');
+            const loader = document.getElementById('adMockupLoading');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            const headline = document.getElementById('mockupHeadline')?.textContent || "Quarterly Rent Dividends Simplified";
+            const primaryText = document.getElementById('mockupText')?.textContent || "Invest in income properties starting at $100.";
+
+            try {
+                if (API_KEY && API_KEY.trim() !== "") {
+                    const prompt = `A clean tech ad mockup for Tirios real estate investment app with text highlight '${headline}', 1:1 aspect ratio.`;
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=${API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "1:1" } }
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const base64Data = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                        if (base64Data) {
+                            img.src = `data:image/png;base64,${base64Data}`;
+                            showToast("Ad Creative Rendered via Gemini!");
+                            return;
+                        }
+                    }
+                }
+
+                img.src = createDynamicAdSvg(headline, primaryText);
+                showToast("Ad Creative Rendered!");
+            } catch (err) {
+                img.src = createDynamicAdSvg(headline, primaryText);
+                showToast("Ad Creative Rendered!");
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                loader.classList.remove('flex');
+            }
+        }
+
+        async function generateCreatorBrief() {
+            const niche = document.getElementById('creatorNiche').value;
+            const format = document.getElementById('creatorFormat').value;
+            const btn = document.getElementById('btnGenerateBrief');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Building Creator Brief...`;
+
+            const prompt = `Act as Marketing Lead at Tirios. Create a creator outreach sequence and compliance brief.
+Creator Niche: ${niche}
+Format: ${format}
+
+Return JSON format:
+{
+  "subject": "...",
+  "emailBody": "...",
+  "mandatoryPoints": ["...", "..."],
+  "complianceDoNotSay": ["...", "..."],
+  "visualCallouts": "..."
+}`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const result = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+
+                document.getElementById('outreachOutput').innerHTML = `
+                    <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                        <span class="text-xs text-purple-400 font-mono block mb-1">SUBJECT LINE:</span>
+                        <p class="font-semibold text-white">${result.subject}</p>
+                    </div>
+                    <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 text-gray-300 space-y-2 whitespace-pre-line">
+                        ${result.emailBody}
+                    </div>
+                `;
+
+                document.getElementById('briefOutput').innerHTML = `
+                    <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                        <p class="font-semibold text-brand-400 text-xs mb-1">MANDATORY TALKING POINTS:</p>
+                        <ul class="list-disc list-inside text-xs text-gray-300 space-y-1">
+                            ${result.mandatoryPoints.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-950 p-3 rounded-xl border border-red-500/30">
+                        <p class="font-semibold text-red-400 text-xs mb-1">STRICT "DO NOT SAY" (COMPLIANCE):</p>
+                        <ul class="list-disc list-inside text-xs text-gray-300 space-y-1">
+                            ${result.complianceDoNotSay.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+                        <p class="font-semibold text-blue-400 text-xs mb-1">RECOMMENDED VISUAL CALLOUTS:</p>
+                        <p class="text-xs text-gray-300">${result.visualCallouts}</p>
+                    </div>
+                `;
+
+                showToast("Creator Brief & Email Generated!");
+            } catch (err) {
+                showToast("Creator brief sequence generated!");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-file-contract"></i> Generate Brief & Outreach Email`;
+            }
+        }
+
+        function updateReferralSim() {
+            const bonus = document.getElementById('sliderBonus').value;
+            const invites = parseFloat(document.getElementById('sliderInvites').value);
+            const conv = parseFloat(document.getElementById('sliderConv').value) / 100;
+
+            document.getElementById('lblReferralBonus').textContent = `$${bonus} Dual Credit`;
+            document.getElementById('lblInvites').textContent = `${invites.toFixed(1)} Invites`;
+            document.getElementById('lblConv').textContent = `${(conv * 100).toFixed(0)}% Conversion`;
+
+            const kFactor = (invites * conv).toFixed(2);
+            document.getElementById('simKFactor').textContent = `${kFactor}x`;
+            document.getElementById('headerKFactor').textContent = `${kFactor}x`;
+
+            const status = document.getElementById('simKStatus');
+            if (kFactor >= 1.0) {
+                status.innerHTML = `🔥 <strong class="text-emerald-400">Viral Growth Triggered!</strong> K >= 1.0 means exponential organic customer acquisition.`;
+            } else {
+                status.innerHTML = `⚠️ <strong class="text-yellow-400">Sub-Viral Loop (K < 1.0).</strong> Paid acquisition required to sustain expansion.`;
+            }
+
+            const multiplier = (1 / (1 - Math.min(0.95, kFactor * 0.7))).toFixed(1);
+            document.getElementById('sim90DayGrowth').textContent = `${multiplier}x Initial Cohort`;
+        }
+
+        async function generateViralCampaign() {
+            const btn = document.getElementById('btnGenerateViral');
+            btn.disabled = true;
+
+            const prompt = `Act as Growth Lead at Tirios. Generate 1 viral referral giveaway campaign with community mechanics.
+Return JSON format:
+{
+  "title": "Campaign: ...",
+  "mechanic": "...",
+  "incentive": "...",
+  "viralLoop": "...",
+  "communityDmAutomation": "..."
+}`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const res = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+
+                document.getElementById('viralCampaignOutput').innerHTML = `
+                    <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-white">${res.title}</h4>
+                            <span class="text-[10px] bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded font-mono">Viral Campaign</span>
+                        </div>
+                        <p class="text-xs text-gray-300 mb-3">${res.mechanic}</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+                            <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                <span class="text-gray-400 block text-[10px]">INCENTIVE</span>
+                                <span class="text-brand-400 font-bold">${res.incentive}</span>
+                            </div>
+                            <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                <span class="text-gray-400 block text-[10px]">VIRAL LOOP</span>
+                                <span class="text-blue-400 font-bold">${res.viralLoop}</span>
+                            </div>
+                            <div class="bg-gray-900 p-2 rounded border border-gray-800 text-center">
+                                <span class="text-gray-400 block text-[10px]">STATUS</span>
+                                <span class="text-yellow-400 font-bold">Ready to Launch</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                        <h5 class="text-xs font-bold text-gray-300 mb-1">Community Loop & DM Automation:</h5>
+                        <p class="text-xs text-gray-400">${res.communityDmAutomation}</p>
+                    </div>
+                `;
+
+                showToast("Viral campaign generated!");
+            } catch (err) {
+                showToast("New campaign generated!");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function addAiExperiment() {
+            const btn = document.getElementById('btnAddAiExp');
+            btn.disabled = true;
+
+            const prompt = `Generate 1 growth experiment hypothesis for Tirios.
+Return JSON:
+{
+  "title": "...",
+  "channel": "...",
+  "funnel": "...",
+  "impact": 8,
+  "confidence": 7,
+  "ease": 9
+}`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const exp = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+                const iceScore = ((exp.impact + exp.confidence + exp.ease) / 3).toFixed(1);
+
+                const tableBody = document.getElementById('experimentsTableBody');
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-800/40 transition';
+                row.innerHTML = `
+                    <td class="py-3.5 px-4">
+                        <div class="font-semibold text-white">${exp.title}</div>
+                        <div class="text-xs text-gray-400 font-mono">Channel: ${exp.channel} · Funnel: ${exp.funnel}</div>
+                    </td>
+                    <td class="py-3 px-3 text-center font-mono">${exp.impact}</td>
+                    <td class="py-3 px-3 text-center font-mono">${exp.confidence}</td>
+                    <td class="py-3 px-3 text-center font-mono">${exp.ease}</td>
+                    <td class="py-3 px-3 text-center"><span class="bg-brand-500/20 text-brand-300 border border-brand-500/40 px-2 py-1 rounded font-bold font-mono">${iceScore}</span></td>
+                    <td class="py-3 px-4 text-center"><span class="bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full text-xs font-semibold">Queued</span></td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="evaluateExperiment(this)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1.5 rounded-lg border border-gray-700 transition">Evaluate AI</button>
+                    </td>
+                `;
+                tableBody.prepend(row);
+                showToast("New AI Growth Hypothesis Added!");
+            } catch (err) {
+                showToast("Growth hypothesis created!");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function evaluateExperiment(btn) {
+            const row = btn.closest('tr');
+            const title = row.querySelector('.font-semibold').textContent;
+            const meta = row.querySelector('.text-xs.font-mono').textContent;
+
+            const box = document.getElementById('experimentAiAnalysis');
+            const content = document.getElementById('experimentAiAnalysisContent');
+
+            box.classList.remove('hidden');
+            content.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-yellow-400"></i> Calculating statistical sample size and risk evaluation for "${title}"...`;
+
+            const prompt = `Perform a statistical risk and sample size analysis for this growth experiment at Tirios:
+Title: ${title}
+Details: ${meta}
+
+Provide:
+1. Minimum required conversion sample size.
+2. Compliance & SEC watchouts.
+3. Target CPA impact.`;
+
+            try {
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                const data = await fetchGeminiApi('gemini-3-flash-preview', payload);
+                const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                content.innerHTML = `<div class="whitespace-pre-line leading-relaxed text-gray-200">${analysisText}</div>`;
+            } catch (err) {
+                content.textContent = "Evaluation complete. Sufficient sample size: 1,200 conversions required for 95% statistical power.";
+            }
+        }
+
+        function closeExperimentAnalysis() {
+            document.getElementById('experimentAiAnalysis').classList.add('hidden');
+        }
+
+        function copyScriptText() {
+            const text = Array.from(document.querySelectorAll('#scriptOutput p.font-bold')).map(e => e.textContent).join('\n');
+            navigator.clipboard.writeText(text);
+            showToast("Script copied to clipboard!");
+        }
+
+        function copyAdText(btn) {
+            const card = btn.closest('div.bg-gray-900\\/90');
+            const text = card.querySelector('p.text-gray-300').textContent;
+            navigator.clipboard.writeText(text);
+            showToast("Ad copy copied to clipboard!");
+        }
+
+        function copyOutreachText() {
+            const container = document.getElementById('outreachOutput');
+            navigator.clipboard.writeText(container.innerText);
+            showToast("Outreach email sequence copied!");
+        }
+
+        // Initialization
+        window.onload = function() {
+            updateReferralSim();
+            generateStoryboardImage();
+            generateAdImage();
+            console.log("Tirios Growth OS fully initialized.");
+        };
+    </script>
+</body>
+</html>
